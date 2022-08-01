@@ -1,0 +1,21 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: 'Inter', sans-serif;
+}
+
+.input-text {
+	border: 1px solid #adb5bd;
+}
+
+.login-button {
+	background-color: #f72585;
+	border: none;
+	color: #fff;
+	transition: 0.1s ease-in-out;
+}
+
+.login-button:hover {
+	background-color: #cc1f6d;
+}
