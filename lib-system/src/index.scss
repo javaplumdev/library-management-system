@@ -1,0 +1,44 @@
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+:root {
+	--button-color: #f72585;
+	--button-color-hover: #cc1f6d;
+	--dark-background: #282d32;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: 'Inter', sans-serif;
+}
+
+body {
+	overflow-x: hidden;
+}
+
+.input-text {
+	border: 1px solid #adb5bd;
+}
+
+.login-button {
+	background-color: var(--button-color);
+	border: none;
+	color: #fff;
+	transition: 0.1s ease-in-out;
+	padding: 0.5em 0.6em;
+	border-radius: 5px;
+}
+
+.outline-button:hover {
+	cursor: pointer;
+}
+
+.login-button:hover {
+	background-color: var(--button-color-hover);
+	cursor: pointer;
+}
+
+.background-dark {
+	background-color: var(--dark-background);
+}
