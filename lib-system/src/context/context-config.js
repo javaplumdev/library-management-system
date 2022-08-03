@@ -7,6 +7,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from 'firebase/auth';
+import { toast } from 'react-hot-toast';
 
 export const ContextVariable = createContext();
 
@@ -17,10 +18,17 @@ export const ContextFunction = ({ children }) => {
 	const [user, setUser] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
 	const [show, setShow] = useState(false);
+	const [bookGenre, setBookGenre] = useState('');
 
 	useEffect(() => {
 		onSnapshot(collection(db, 'users'), (snapshot) => {
 			setUsers(snapshot.docs.map((doc) => ({ ...doc.data() })));
+
+			setIsLoading(false);
+		});
+
+		onSnapshot(collection(db, 'books'), (snapshot) => {
+			setBookData(snapshot.docs.map((doc) => ({ ...doc.data() })));
 
 			setIsLoading(false);
 		});
@@ -65,9 +73,55 @@ export const ContextFunction = ({ children }) => {
 		};
 	}, []);
 
+	const uploadBook = (
+		bookID,
+		bookName,
+		bookAuthor,
+		bookDescription,
+		bookGenre,
+		userID
+	) => {
+		if (
+			bookName === '' ||
+			!bookName.trim() ||
+			bookAuthor === '' ||
+			!bookAuthor.trim() ||
+			bookDescription === '' ||
+			!bookDescription.trim() ||
+			bookGenre === ''
+		) {
+			toast.error('Please put');
+		} else {
+			setDoc(
+				doc(db, 'books', bookID),
+				{
+					bookID: bookID,
+					bookName: bookName,
+					bookAuthor: bookAuthor,
+					bookDescription: bookDescription,
+					bookGenre: bookGenre,
+					userID: userID,
+				},
+				{ merge: true }
+			);
+
+			toast.success('Uploaded');
+			setBookGenre('');
+			handleClose();
+		}
+	};
+
+	const changeGenre = (e) => {
+		setBookGenre(e);
+	};
+
 	return (
 		<ContextVariable.Provider
 			value={{
+				booksData,
+				bookGenre,
+				changeGenre,
+				uploadBook,
 				name,
 				register,
 				login,

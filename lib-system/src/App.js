@@ -6,6 +6,7 @@ import AdminPage from './components/AdminPage';
 import Member from './components/Member';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 	document.body.classList.add('background-dark');
@@ -13,6 +14,7 @@ function App() {
 	return (
 		<ContextFunction>
 			<div className="App">
+				<Toaster />
 				<Routes>
 					<Route path="/" element={<Loginpage />} />
 					<Route path="/register" element={<Register />} />

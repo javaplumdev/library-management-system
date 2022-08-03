@@ -42,3 +42,7 @@ body {
 .background-dark {
 	background-color: var(--dark-background);
 }
+
+.pointer-hover:hover {
+	cursor: pointer;
+}
