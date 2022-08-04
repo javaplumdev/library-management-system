@@ -101,6 +101,7 @@ export const ContextFunction = ({ children }) => {
 					bookDescription: bookDescription,
 					bookGenre: bookGenre,
 					userID: userID,
+					all: 'all',
 				},
 				{ merge: true }
 			);

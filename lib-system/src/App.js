@@ -7,6 +7,7 @@ import Member from './components/Member';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import BookDetails from './components/admin components/BookDetails';
 
 function App() {
 	document.body.classList.add('background-dark');
@@ -18,6 +19,7 @@ function App() {
 				<Routes>
 					<Route path="/" element={<Loginpage />} />
 					<Route path="/register" element={<Register />} />
+
 					<Route
 						path="/home"
 						element={
@@ -39,6 +41,14 @@ function App() {
 						element={
 							<ProtectedRoute>
 								<Member />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/details/:id"
+						element={
+							<ProtectedRoute>
+								<BookDetails />
 							</ProtectedRoute>
 						}
 					/>

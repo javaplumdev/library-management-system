@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ContextVariable } from '../context/context-config';
-import { Spinner, Container, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Spinner, Container, Button, Dropdown } from 'react-bootstrap';
 import NavbarComponent from './admin components/Navbar';
 import { ImBooks } from 'react-icons/im';
 import { BiFilterAlt, BiUpload } from 'react-icons/bi';
@@ -14,11 +14,116 @@ const AdminPage = () => {
 	const { user, users, isLoading, handleShow, booksData } =
 		useContext(ContextVariable);
 
+	const [filterCategory, setFilterCategory] = useState('All');
+
 	const currentUser =
 		users?.filter && users.filter((item) => item.userID === user.uid);
 
 	const currentUserCollection =
 		booksData?.filter && booksData.filter((item) => item.userID === user.uid);
+
+	const getCategory =
+		booksData?.filter &&
+		booksData.filter((item) => item.bookGenre === filterCategory);
+
+	const CategoryRender = () => {
+		if (filterCategory === 'All') {
+			return (
+				<>
+					{currentUserCollection.length === 0 ? (
+						<p className="text-center">No results for </p>
+					) : (
+						currentUserCollection?.map &&
+						currentUserCollection.map((item) => {
+							return (
+								<div
+									key={item.bookID}
+									style={{ width: '260px' }}
+									className="m-1 bg-dark p-3 rounded"
+								>
+									<div className="d-flex justify-content-between">
+										<TbBook size="40" />
+										<BsFillBellFill size="20" />
+									</div>
+									<b style={{ fontSize: '1.2em' }}>{item.bookName}</b>
+									<br></br>
+									<small className="fw-bold text-secondary">
+										{item.bookDescription.slice(0, 20)}
+									</small>
+
+									<div className="mt-2">
+										<small className="bg-secondary p-1 rounded ">
+											{item.bookGenre}
+										</small>
+									</div>
+									<Link to={`/details/${item.bookID}`}>
+										<Button
+											className="w-100 mt-3"
+											variant="outline-light"
+											size="sm"
+										>
+											Details
+										</Button>
+									</Link>
+								</div>
+							);
+						})
+					)}
+				</>
+			);
+		} else {
+			return (
+				<>
+					{getCategory.length === 0 ? (
+						<p className="text-center">No results for {filterCategory}</p>
+					) : (
+						<div>
+							<p>
+								{getCategory.length} results for {filterCategory}
+							</p>
+							<div className="d-flex flex-wrap">
+								{getCategory?.map &&
+									getCategory.map((item) => {
+										return (
+											<div
+												key={item.bookID}
+												style={{ width: '260px' }}
+												className="m-1 bg-dark p-3 rounded"
+											>
+												<div className="d-flex justify-content-between">
+													<TbBook size="40" />
+													<BsFillBellFill size="20" />
+												</div>
+												<b style={{ fontSize: '1.2em' }}>{item.bookName}</b>
+												<br></br>
+												<small className="fw-bold text-secondary">
+													{item.bookDescription.slice(0, 20)}
+												</small>
+
+												<div className="mt-2">
+													<small className="bg-secondary p-1 rounded ">
+														{item.bookGenre}
+													</small>
+												</div>
+												<Link to={`/details/${item.bookID}`}>
+													<Button
+														className="w-100 mt-3"
+														variant="outline-light"
+														size="sm"
+													>
+														Details
+													</Button>
+												</Link>
+											</div>
+										);
+									})}
+							</div>
+						</div>
+					)}
+				</>
+			);
+		}
+	};
 
 	return (
 		<div>
@@ -37,10 +142,10 @@ const AdminPage = () => {
 								<div className="my-2">
 									<b>All books</b>{' '}
 									<small className="text-secondary">
-										{currentUserCollection.length === 0 ||
-										currentUserCollection.length === 1
-											? `${currentUserCollection.length} document`
-											: `${currentUserCollection.length} documents`}
+										{currentUserCollection?.length === 0 ||
+										currentUserCollection?.length === 1
+											? `${currentUserCollection?.length} document`
+											: `${currentUserCollection?.length} documents`}
 									</small>
 								</div>
 								<div className="d-flex align-items-center my-2">
@@ -56,7 +161,10 @@ const AdminPage = () => {
 											{genres?.map &&
 												genres.map((item) => {
 													return (
-														<Dropdown.Item key={item.id}>
+														<Dropdown.Item
+															key={item.id}
+															onClick={() => setFilterCategory(item.name)}
+														>
 															{item.name}
 														</Dropdown.Item>
 													);
@@ -70,38 +178,13 @@ const AdminPage = () => {
 										onClick={handleShow}
 									>
 										<BiUpload size="20" className=" me-2" />
-										Upload doc
+										Upload book
 									</small>
 									<UploadBookModal />
 								</div>
 							</div>
-							<div className="d-flex flex-wrap mt-3 justify-content-left">
-								{currentUserCollection?.map &&
-									currentUserCollection.map((item) => {
-										return (
-											<div
-												key={item.bookID}
-												style={{ minWidth: '260px' }}
-												className="m-1 bg-dark p-3 rounded"
-											>
-												<div className="d-flex justify-content-between">
-													<TbBook size="40" />
-													<BsFillBellFill size="20" />
-												</div>
-												<b style={{ fontSize: '1.2em' }}>{item.bookName}</b>
-												<br></br>
-												<small className="fw-bold text-secondary">
-													{item.bookDescription.slice(0, 20)}
-												</small>
-
-												<div className="mt-2">
-													<small className="bg-secondary p-1 rounded ">
-														{item.bookGenre}
-													</small>
-												</div>
-											</div>
-										);
-									})}
+							<div className="d-flex flex-wrap mt-3 ">
+								<CategoryRender />
 							</div>
 						</Container>
 					</div>
