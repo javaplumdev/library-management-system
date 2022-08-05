@@ -1,6 +1,15 @@
 import { createContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase/firebase-config';
-import { collection, onSnapshot, setDoc, doc } from '@firebase/firestore';
+import {
+	collection,
+	onSnapshot,
+	setDoc,
+	doc,
+	query,
+	serverTimestamp,
+	orderBy,
+	deleteDoc,
+} from '@firebase/firestore';
 import {
 	onAuthStateChanged,
 	createUserWithEmailAndPassword,
@@ -8,6 +17,8 @@ import {
 	signOut,
 } from 'firebase/auth';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 export const ContextVariable = createContext();
 
@@ -19,18 +30,40 @@ export const ContextFunction = ({ children }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [show, setShow] = useState(false);
 	const [bookGenre, setBookGenre] = useState('');
+	const [filterCategory, setFilterCategory] = useState('All');
+	const [pendingRequestData, setPendingRequestData] = useState({});
+	const [userCollection, setUserCollection] = useState({});
+
+	let navigate = useNavigate();
+
+	const getCategory =
+		booksData?.filter &&
+		booksData.filter((item) => item.bookGenre === filterCategory);
 
 	useEffect(() => {
+		const queryBooksData = query(
+			collection(db, 'books'),
+			orderBy('timestamp', 'desc')
+		);
+
 		onSnapshot(collection(db, 'users'), (snapshot) => {
 			setUsers(snapshot.docs.map((doc) => ({ ...doc.data() })));
 
 			setIsLoading(false);
 		});
 
-		onSnapshot(collection(db, 'books'), (snapshot) => {
+		onSnapshot(queryBooksData, (snapshot) => {
 			setBookData(snapshot.docs.map((doc) => ({ ...doc.data() })));
 
 			setIsLoading(false);
+		});
+
+		onSnapshot(collection(db, 'pending-requests'), (snapshot) => {
+			setPendingRequestData(snapshot.docs.map((doc) => ({ ...doc.data() })));
+		});
+
+		onSnapshot(collection(db, 'user-collection'), (snapshot) => {
+			setUserCollection(snapshot.docs.map((doc) => ({ ...doc.data() })));
 		});
 	}, []);
 
@@ -79,7 +112,8 @@ export const ContextFunction = ({ children }) => {
 		bookAuthor,
 		bookDescription,
 		bookGenre,
-		userID
+		userID,
+		bookCopies
 	) => {
 		if (
 			bookName === '' ||
@@ -88,7 +122,8 @@ export const ContextFunction = ({ children }) => {
 			!bookAuthor.trim() ||
 			bookDescription === '' ||
 			!bookDescription.trim() ||
-			bookGenre === ''
+			bookGenre === '' ||
+			parseInt(bookCopies) === 0
 		) {
 			toast.error('Please put');
 		} else {
@@ -101,7 +136,8 @@ export const ContextFunction = ({ children }) => {
 					bookDescription: bookDescription,
 					bookGenre: bookGenre,
 					userID: userID,
-					all: 'all',
+					bookCopies: parseInt(bookCopies),
+					timestamp: serverTimestamp(),
 				},
 				{ merge: true }
 			);
@@ -116,9 +152,72 @@ export const ContextFunction = ({ children }) => {
 		setBookGenre(e);
 	};
 
+	const deleteBook = async (e) => {
+		navigate('/admin');
+
+		await deleteDoc(doc(db, 'books', e));
+
+		toast.success('Book deleted');
+	};
+
+	const requestBook = async (userID, bookID) => {
+		let pendingID = uuidv4();
+
+		const findPendingRequestData =
+			pendingRequestData?.find &&
+			pendingRequestData.find(
+				(item) => item.bookRequesting === bookID && item.userID === user.uid
+			);
+
+		if (findPendingRequestData) {
+			toast.success('Request removed');
+			await deleteDoc(
+				doc(db, 'pending-requests', findPendingRequestData.pendingRequestID)
+			);
+		} else {
+			toast.success('Request added');
+			setDoc(doc(db, 'pending-requests', pendingID), {
+				userID: userID,
+				bookRequesting: bookID,
+				pendingRequestID: pendingID,
+				isGranted: false,
+			});
+		}
+	};
+
+	const confirmBorrow = async (userID, bookRequesting, pendingRequestID) => {
+		let userCollectionID = uuidv4();
+
+		setDoc(doc(db, 'user-collection', userCollectionID), {
+			owner: userID,
+			bookRequesting: bookRequesting,
+		});
+
+		booksData.map((item) => {
+			if (item.bookID === bookRequesting) {
+				setDoc(
+					doc(db, 'books', bookRequesting),
+					{
+						bookCopies: item.bookCopies - 1,
+					},
+					{ merge: true }
+				);
+			}
+		});
+
+		await deleteDoc(doc(db, 'pending-requests', pendingRequestID));
+	};
+
 	return (
 		<ContextVariable.Provider
 			value={{
+				confirmBorrow,
+				pendingRequestData,
+				requestBook,
+				getCategory,
+				filterCategory,
+				setFilterCategory,
+				deleteBook,
 				booksData,
 				bookGenre,
 				changeGenre,

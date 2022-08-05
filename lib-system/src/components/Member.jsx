@@ -1,23 +1,13 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ContextVariable } from '../context/context-config';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Container, Button } from 'react-bootstrap';
+import NavbarComponent from './user components/NavbarComponent';
+import { v4 as uuidv4 } from 'uuid';
 
 const Member = () => {
-	const { user, logOut, users, isLoading } = useContext(ContextVariable);
-	const navigate = useNavigate();
-
-	const handleLogout = async () => {
-		try {
-			await logOut();
-			navigate('/');
-		} catch (error) {
-			console.log(error.message);
-		}
-	};
-
-	const currentUser =
-		users?.filter && users.filter((item) => item.userID === user.uid);
+	const { requestBook, booksData, user, isLoading, pendingRequestData } =
+		useContext(ContextVariable);
 
 	return (
 		<div>
@@ -25,12 +15,61 @@ const Member = () => {
 				<Spinner animation="border" variant="secondary" />
 			) : (
 				<>
-					{currentUser?.map &&
-						currentUser.map((item) => {
-							return <p key={item.userID}>Hi member! {item.username}</p>;
-						})}
+					<NavbarComponent />
 
-					<button onClick={handleLogout}>Log out </button>
+					<Container>
+						<p className="text-white">Books available</p>
+						<p className="text-white">My collection</p>
+						<div className="d-flex flex-wrap">
+							{booksData?.map &&
+								booksData.map((item) => {
+									return (
+										<div
+											key={item.bookID}
+											style={{ width: '260px' }}
+											className="m-2 bg-dark text-white p-3 rounded"
+										>
+											<div className="d-flex justify-content-between">
+												<div>
+													<b>{item.bookName.slice(0, 25)}</b>
+													<br></br>
+													<small className="lead text-secondary fw-bold">
+														{item.bookAuthor}
+													</small>
+													<br></br>
+													<small className="overflowWrap text-secondary w-100">
+														{item.bookDescription.slice(0, 20)}
+													</small>
+												</div>
+											</div>
+											<hr></hr>
+											<p>Book copies: {item.bookCopies}</p>
+
+											{pendingRequestData?.find &&
+											pendingRequestData.find(
+												(data) => data.bookRequesting === item.bookID
+											) ? (
+												<Button
+													variant="light"
+													className="w-100"
+													onClick={() => requestBook(user.uid, item.bookID)}
+												>
+													Requested
+												</Button>
+											) : (
+												<Button
+													variant="outline-light"
+													className="w-100"
+													onClick={() => requestBook(user.uid, item.bookID)}
+												>
+													Request
+												</Button>
+											)}
+										</div>
+									);
+								})}
+						</div>
+					</Container>
 				</>
 			)}
 		</div>

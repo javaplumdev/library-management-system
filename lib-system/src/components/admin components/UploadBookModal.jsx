@@ -13,6 +13,10 @@ const UploadBookModal = () => {
 	const [bookName, setBookName] = useState('');
 	const [bookAuthor, setBookAuthor] = useState('');
 	const [bookDescription, setBookDescription] = useState('');
+	const [bookCopies, setBookCopies] = useState(0);
+
+	const finalizedGenre =
+		genres?.filter && genres.filter((item) => item.name !== 'All');
 
 	return (
 		<Modal show={show} onHide={handleClose}>
@@ -41,11 +45,24 @@ const UploadBookModal = () => {
 					onChange={(e) => setBookDescription(e.target.value)}
 				/>
 
+				<label htmlFor="tentacles" className="me-2">
+					Copy:
+				</label>
+
+				<input
+					type="number"
+					className="input-text p-2 w-25 rounded my-1"
+					id="tentacles"
+					name="tentacles"
+					min="0"
+					onChange={(e) => setBookCopies(e.target.value)}
+				/>
+
 				<div>
 					<small>Check a genre:</small>
 					<div className="d-flex flex-wrap">
-						{genres?.map &&
-							genres.map((item) => {
+						{finalizedGenre?.map &&
+							finalizedGenre.map((item) => {
 								return (
 									<small
 										key={item.id}
@@ -82,7 +99,8 @@ const UploadBookModal = () => {
 							bookAuthor,
 							bookDescription,
 							bookGenre,
-							user.uid
+							user.uid,
+							bookCopies
 						)
 					}
 				>

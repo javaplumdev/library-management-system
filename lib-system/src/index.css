@@ -12488,6 +12488,7 @@ fieldset:disabled .btn {
   --button-color: #f72585;
   --button-color-hover: #cc1f6d;
   --dark-background: #282d32;
+  --button-color-hover-dark: #adb5bd;
 }
 
 * {
@@ -12537,5 +12538,10 @@ body {
   overflow-wrap: break-word;
   max-width: 100%;
   margin: 1em 0;
+}
+
+.button-class:hover {
+  cursor: pointer;
+  color: var(--button-color-hover-dark);
 }
 /*# sourceMappingURL=index.css.map */

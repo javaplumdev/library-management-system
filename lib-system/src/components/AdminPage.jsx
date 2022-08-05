@@ -11,26 +11,25 @@ import UploadBookModal from './admin components/UploadBookModal';
 import { genres } from '../data/data';
 
 const AdminPage = () => {
-	const { user, users, isLoading, handleShow, booksData } =
-		useContext(ContextVariable);
-
-	const [filterCategory, setFilterCategory] = useState('All');
-
-	const currentUser =
-		users?.filter && users.filter((item) => item.userID === user.uid);
+	const {
+		user,
+		users,
+		isLoading,
+		handleShow,
+		booksData,
+		filterCategory,
+		setFilterCategory,
+		getCategory,
+	} = useContext(ContextVariable);
 
 	const currentUserCollection =
 		booksData?.filter && booksData.filter((item) => item.userID === user.uid);
-
-	const getCategory =
-		booksData?.filter &&
-		booksData.filter((item) => item.bookGenre === filterCategory);
 
 	const CategoryRender = () => {
 		if (filterCategory === 'All') {
 			return (
 				<>
-					{currentUserCollection.length === 0 ? (
+					{currentUserCollection?.length === 0 ? (
 						<p className="text-center">No results for </p>
 					) : (
 						currentUserCollection?.map &&
@@ -45,9 +44,13 @@ const AdminPage = () => {
 										<TbBook size="40" />
 										<BsFillBellFill size="20" />
 									</div>
-									<b style={{ fontSize: '1.2em' }}>{item.bookName}</b>
+									<b>{item.bookName.slice(0, 25)}</b>
 									<br></br>
-									<small className="fw-bold text-secondary">
+									<small className="lead text-secondary fw-bold">
+										{item.bookAuthor}
+									</small>
+									<br></br>
+									<small className="text-secondary">
 										{item.bookDescription.slice(0, 20)}
 									</small>
 
@@ -88,15 +91,20 @@ const AdminPage = () => {
 											<div
 												key={item.bookID}
 												style={{ width: '260px' }}
-												className="m-1 bg-dark p-3 rounded"
+												className="m-1 bg-dark p-3 rounded h-100"
 											>
 												<div className="d-flex justify-content-between">
 													<TbBook size="40" />
 													<BsFillBellFill size="20" />
 												</div>
-												<b style={{ fontSize: '1.2em' }}>{item.bookName}</b>
+												<b>{item.bookName.slice(0, 25)}</b>
 												<br></br>
-												<small className="fw-bold text-secondary">
+												<small className="lead text-secondary fw-bold">
+													{item.bookAuthor}
+												</small>
+
+												<br></br>
+												<small className="text-secondary">
 													{item.bookDescription.slice(0, 20)}
 												</small>
 
@@ -128,7 +136,12 @@ const AdminPage = () => {
 	return (
 		<div>
 			{isLoading ? (
-				<Spinner animation="border" variant="secondary" />
+				<div
+					className="d-flex justify-content-center align-items-center"
+					style={{ height: '80vh' }}
+				>
+					<Spinner animation="border" variant="secondary" />
+				</div>
 			) : (
 				<>
 					<NavbarComponent />
