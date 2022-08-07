@@ -195,13 +195,17 @@ export const ContextFunction = ({ children }) => {
 
 		booksData.map((item) => {
 			if (item.bookID === bookRequesting) {
-				setDoc(
-					doc(db, 'books', bookRequesting),
-					{
-						bookCopies: item.bookCopies - 1,
-					},
-					{ merge: true }
-				);
+				if (item.bookCopies.length <= 0) {
+					toast.error('No more copies left.');
+				} else {
+					setDoc(
+						doc(db, 'books', bookRequesting),
+						{
+							bookCopies: item.bookCopies - 1,
+						},
+						{ merge: true }
+					);
+				}
 			}
 		});
 
@@ -211,6 +215,7 @@ export const ContextFunction = ({ children }) => {
 	return (
 		<ContextVariable.Provider
 			value={{
+				userCollection,
 				confirmBorrow,
 				pendingRequestData,
 				requestBook,
