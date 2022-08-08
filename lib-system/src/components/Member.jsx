@@ -51,53 +51,57 @@ const Member = () => {
 						</div>
 						<div className="d-flex flex-wrap">
 							{iSRenderCollection === false ? (
-								booksCollection?.map &&
-								booksCollection.map((item) => {
-									return (
-										<div
-											key={item.bookID}
-											style={{ width: '260px' }}
-											className="m-2 bg-dark text-white p-3 rounded"
-										>
-											<div className="d-flex justify-content-between">
-												<div>
-													<b>{item.bookName.slice(0, 25)}</b>
-													<br></br>
-													<small className="lead text-secondary fw-bold">
-														{item.bookAuthor}
-													</small>
-													<br></br>
-													<small className="overflowWrap text-secondary w-100">
-														{item.bookDescription.slice(0, 20)}
-													</small>
+								booksCollection.length === 0 ? (
+									<h3 className="text-white">No books</h3>
+								) : (
+									booksCollection?.map &&
+									booksCollection.map((item) => {
+										return (
+											<div
+												key={item.bookID}
+												style={{ width: '260px' }}
+												className="m-2 bg-dark text-white p-3 rounded"
+											>
+												<div className="d-flex justify-content-between">
+													<div>
+														<b>{item.bookName.slice(0, 25)}</b>
+														<br></br>
+														<small className="lead text-secondary fw-bold">
+															{item.bookAuthor}
+														</small>
+														<br></br>
+														<small className="overflowWrap text-secondary w-100">
+															{item.bookDescription.slice(0, 20)}
+														</small>
+													</div>
 												</div>
-											</div>
-											<hr></hr>
-											<p>Book copies: {item.bookCopies}</p>
+												<hr></hr>
+												<p>Book copies: {item.bookCopies}</p>
 
-											{pendingRequestData?.find &&
-											pendingRequestData.find(
-												(data) => data.bookRequesting === item.bookID
-											) ? (
-												<Button
-													variant="light"
-													className="w-100"
-													onClick={() => requestBook(user.uid, item.bookID)}
-												>
-													Requested
-												</Button>
-											) : (
-												<Button
-													variant="outline-light"
-													className="w-100"
-													onClick={() => requestBook(user.uid, item.bookID)}
-												>
-													Request
-												</Button>
-											)}
-										</div>
-									);
-								})
+												{pendingRequestData?.find &&
+												pendingRequestData.find(
+													(data) => data.bookRequesting === item.bookID
+												) ? (
+													<Button
+														variant="light"
+														className="w-100"
+														onClick={() => requestBook(user.uid, item.bookID)}
+													>
+														Requested
+													</Button>
+												) : (
+													<Button
+														variant="outline-light"
+														className="w-100"
+														onClick={() => requestBook(user.uid, item.bookID)}
+													>
+														Request
+													</Button>
+												)}
+											</div>
+										);
+									})
+								)
 							) : (
 								<div className="d-flex flex-wrap">
 									{booksData?.map &&
